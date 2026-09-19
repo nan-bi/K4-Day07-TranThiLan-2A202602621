@@ -1,33 +1,25 @@
 ---
 doc_id: dormitory
-title: Quy định ký túc xá
+title: Cuộc sống Ký túc xá VinUni
 audience: student
 department: student-affairs
 category: housing
-language: vi
-source_url: https://example.edu/sinh-vien/ky-tuc-xa
-retrieved_at: 2026-09-15
-document_version: "2026.2"
+source_url: https://vinuni.edu.vn/cuoc-song-ky-tuc-xa/
+retrieved_at: 2026-09-19
+document_version: "2026.1"
+license_or_permission: public-source
 ---
 
-# Quy định ký túc xá
+# Cuộc sống Ký túc xá VinUni
 
-## Đăng ký ở ký túc xá
+## Cấu trúc và Cơ sở vật chất
+Ký túc xá (KTX) của Đại học VinUni tọa lạc tại Khu đô thị Vinhomes Ocean Park, Gia Lâm, Hà Nội. KTX bao gồm hai tòa nhà chính là JA (dành cho nữ) và JB (dành cho nam), được kết nối với nhau bởi hành lang chính JC.
 
-Sinh viên đăng ký ký túc xá trực tuyến qua cổng sinh viên trong thời gian mở đăng ký (thường từ 01/07 đến 15/08 hằng năm). Ưu tiên xét duyệt theo thứ tự: sinh viên năm nhất, sinh viên có hoàn cảnh khó khăn, và sinh viên từ các tỉnh xa.
+## Các loại hình căn hộ
+Mỗi tòa nhà có 35 căn hộ với ba loại hình:
+- Căn hộ 8 giường (~96 mét vuông): Chia thành các phòng ngủ 3-3-2.
+- Căn hộ 4 giường (~50.5 mét vuông): Chia thành 2 phòng ngủ (2-2).
+- Căn hộ 2 giường (21.2 mét vuông).
 
-## Phí ký túc xá
-
-- Phòng 8 người: 300.000 đồng/tháng/sinh viên
-- Phòng 6 người: 450.000 đồng/tháng/sinh viên
-- Phòng 4 người (có máy lạnh): 700.000 đồng/tháng/sinh viên
-
-Phí ký túc xá đóng theo học kỳ (5 tháng), thanh toán cùng lúc với học phí qua cổng tài chính trực tuyến.
-
-## Nội quy sinh hoạt
-
-Sinh viên phải tuân thủ giờ giới nghiêm từ 23:00 đến 05:00. Không được nấu ăn trong phòng, không sử dụng thiết bị điện công suất lớn (bếp điện, bàn ủi). Vi phạm nội quy lần đầu sẽ bị cảnh cáo bằng văn bản, lần hai sẽ bị buộc rời ký túc xá.
-
-## Thủ tục trả phòng
-
-Sinh viên trả phòng phải thông báo trước 15 ngày, hoàn trả thẻ ra vào và chìa khóa. Phòng phải được dọn sạch sẽ; nếu có hư hỏng tài sản, sinh viên phải bồi thường theo bảng giá niêm yết.
+## Tiện ích chung
+Mỗi tầng đều có khu vực Pantry trang bị sofa, bàn ghế, lò vi sóng và tủ đựng đồ để sinh viên giao lưu và chuẩn bị bữa ăn. Khu bếp chung tọa lạc tại tầng hai của hành lang JC, mở cửa 24/7, được trang bị bếp điện, lò nướng và lò vi sóng. Sinh viên cần tự chuẩn bị dụng cụ nấu ăn và thực phẩm. Việc sắp xếp chỗ ở giúp sinh viên chia sẻ phòng với bạn bè từ các Viện và chuyên ngành khác nhau, thúc đẩy sự hòa nhập.

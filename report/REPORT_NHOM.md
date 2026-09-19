@@ -23,21 +23,17 @@
 
 | # | Tên tài liệu | Nguồn (Source URL) | Ngày lấy / Phiên bản | Số ký tự | Metadata đã gán |
 |---|--------------|------------|--------------------|----------|--------------------|
-| 1 | Quy định học phí và miễn giảm | https://example.edu/tai-chinh/hoc-phi | 2026-09-15 / 2026.2 | 1.382 | audience=student, department=finance, category=policy |
-| 2 | Chính sách học bổng | https://example.edu/hoc-vu/hoc-bong | 2026-09-15 / 2026.2 | 957 | audience=student, department=academic-affairs, category=scholarship |
-| 3 | Quy định ký túc xá | https://example.edu/sinh-vien/ky-tuc-xa | 2026-09-15 / 2026.2 | 1.031 | audience=student, department=student-affairs, category=housing |
-| 4 | Quy trình phúc khảo | https://example.edu/hoc-vu/phuc-khao | 2026-09-15 / 2026.2 | 1.040 | audience=student, department=academic-affairs, category=academic-process |
-| 5 | Đăng ký học phần chi tiết | https://example.edu/hoc-vu/dang-ky-hoc-phan-chi-tiet | 2026-09-15 / 2026.2 | 1.449 | audience=student, department=academic-affairs, category=registration |
-| 6 | Dịch vụ thư viện chi tiết | https://example.edu/thu-vien/dich-vu-chi-tiet | 2026-09-15 / 2026.2 | 1.324 | audience=all, department=library, category=service |
-| 7 | Điều kiện tốt nghiệp | https://example.edu/hoc-vu/tot-nghiep | 2026-09-15 / 2026.2 | 1.037 | audience=student, department=academic-affairs, category=graduation |
-| 8 | Lịch trình học vụ | https://example.edu/hoc-vu/lich-trinh | 2026-09-15 / 2026.2 | 967 | audience=all, department=academic-affairs, category=schedule |
-| 9 | Hướng dẫn giảng dạy | https://example.edu/giang-vien/huong-dan-giang-day | 2026-09-15 / 2026.2 | 945 | audience=faculty, department=academic-affairs, category=teaching |
+| 1 | Học phí và Hỗ trợ tài chính VinUni | https://vinuni.edu.vn/hoc-phi-ho-tro-tai-chinh/ | 2026-09-19 / 2026.1 | 638 | audience=student, department=finance, category=tuition |
+| 2 | Chương trình Học bổng VinUni | https://vinuni.edu.vn/hoc-bong-tai-tro-dao-tao-tu-tap-doan-vingroup/ | 2026-09-19 / 2026.1 | 679 | audience=student, department=academic-affairs, category=scholarship |
+| 3 | Cuộc sống Ký túc xá VinUni | https://vinuni.edu.vn/cuoc-song-ky-tuc-xa/ | 2026-09-19 / 2026.1 | 682 | audience=student, department=student-affairs, category=housing |
+| 4 | Thư viện Đại học VinUni | https://library.vinuni.edu.vn/ | 2026-09-19 / 2026.1 | 647 | audience=all, department=library, category=facilities |
+| 5 | Thông tin Tuyển sinh VinUni | https://admissions.vinuni.edu.vn/ | 2026-09-19 / 2026.1 | 754 | audience=faculty, department=admissions, category=guidelines |
 
 **Danh sách kiểm tra quản trị dữ liệu (Data governance checklist):**
 - [x] Tập tài liệu chỉ chứa nguồn công khai/được phép dùng, không chứa dữ liệu cá nhân
 - [x] Mỗi tài liệu có `source_url`, `retrieved_at`, `document_version` trong metadata
-- [x] `audience` có 3 giá trị khác nhau: student (7 files), all (3 files), faculty (1 file)
-- [x] `sources.csv` khớp 1-1 với 11 file .md (kiểm tra bằng script CP2)
+- [x] `audience` có 3 giá trị khác nhau: student (3 files), all (1 file), faculty (1 file)
+- [x] `sources.csv` khớp 1-1 với 5 file .md (kiểm tra bằng script CP2)
 
 ### Cấu trúc Metadata (Metadata Schema)
 
@@ -109,11 +105,11 @@ class HeadingChunker:
 
 | # | Câu hỏi (Query) | Câu trả lời chuẩn (Gold Answer) | Chunk chứa thông tin |
 |---|-------|-------------------------------|-----------------------|
-| 1 | Mức học phí mỗi tín chỉ là bao nhiêu? | 450.000đ/tín chỉ (đại trà), 850.000đ/tín chỉ (CLC), 520.000đ/tín chỉ (CNTT/KTPM/AI) | tuition-fees.md § Mức học phí |
-| 2 | Sinh viên cần bao nhiêu tín chỉ tốt nghiệp? (filter: audience=student) | 130-140 tín chỉ, GPA ≥ 2.0, TOEIC ≥ 450 / IELTS ≥ 5.0 | graduation-requirements.md § Yêu cầu tín chỉ & Ngoại ngữ |
-| 3 | Thời hạn mượn sách thư viện là bao lâu? | SV: 14 ngày max 5 cuốn; GV: 30 ngày max 10 cuốn; gia hạn max 2 lần | library-services-full.md § Dịch vụ mượn tài liệu |
-| 4 | Quy trình phúc khảo gồm mấy bước? | 5 bước: nộp đơn → 2 GV chấm lại → trung bình → thông báo 15 ngày → điểm cuối cùng | grade-review.md § Quy trình xử lý |
-| 5 | GV cần nộp điểm bao lâu sau thi? (filter: audience=faculty) | 10 ngày làm việc sau ngày thi | faculty-teaching-guidelines.md § Thời hạn nộp điểm |
+| 1 | Khi nào sinh viên VinUni phải đóng học phí? | Đóng thành hai đợt mỗi năm vào đầu các học kỳ chính (Học kỳ Mùa thu và Học kỳ Mùa xuân). | tuition.md § Quy định tài chính |
+| 2 | Học bổng WIT dành cho ai và trị giá bao nhiêu? (filter: audience=student) | Trị giá 5% học phí dành cho nữ giới theo đuổi lĩnh vực khoa học công nghệ. | scholarships.md § Học bổng đặc thù khác |
+| 3 | Khu bếp chung ở KTX có những thiết bị gì? | Bếp điện, lò nướng và lò vi sóng. | dormitory.md § Tiện ích chung |
+| 4 | Thư viện có mở cửa buổi đêm không? | Thư viện có không gian học tập mở cửa 24/7 để phục vụ nhu cầu tự học ngoài giờ. | library.md § Không gian học tập |
+| 5 | Phương thức xét tuyển chính của VinUni là gì? (filter: audience=faculty) | Hình thức xét tuyển kết hợp (đánh giá hồ sơ học thuật, năng lực cá nhân, bài luận, phỏng vấn, chứng chỉ tiếng Anh). | admissions.md § Phương thức xét tuyển |
 
 ### Tổng hợp chất lượng truy xuất của nhóm
 
@@ -122,30 +118,31 @@ class HeadingChunker:
 
 | # | Câu hỏi | Chiến lược: HeadingChunker | doc_id ở top-3? | marker ở top-3? | Score |
 |---|---------|---------------------------|-----------------|-----------------|-------|
-| 1 | Học phí? | scholarship#1 (top-1) | ❌ | ❌ | 0 |
-| 2 | Tín chỉ tốt nghiệp? (filter: student) | course-registration-full#4 | ❌ | ❌ | 0 |
-| 3 | Mượn sách? | library-services-full#1 | ✓ (đúng doc) | ❌ (giờ hoạt động, không phải mượn) | 1 |
-| 4 | Phúc khảo? | grade-review#3 | ✓ (đúng doc) | ❌ (lệ phí, không phải quy trình) | 1 |
-| 5 | GV nộp điểm? (filter: faculty) | faculty-teaching-guidelines#0 | ✓ (đúng doc) | ❌ (heading, thiếu nội dung) | 0 |
-| | | | **Tổng** | | **2/10** |
+| 1 | Đóng học phí? | library#0 (top-1) | ❌ | ❌ | 0 |
+| 2 | Học bổng WIT? (filter: student) | tuition#3 | ❌ | ❌ | 0 |
+| 3 | Thiết bị bếp? | dormitory#0 | ✓ (đúng doc) | ❌ (thiếu đồ cụ thể) | 1 |
+| 4 | Mở cửa 24/7? | dormitory#3 | ❌ | ❌ | 0 |
+| 5 | Phương thức? (filter: faculty) | admissions#2 | ✓ (đúng doc) | ❌ (sai section) | 1 |
+| | | | | **Tổng** | | **2/10** |
 
 > **Chênh lệch hai cách chấm**: Nếu chỉ chấm level 1 (doc_id): 3/5 câu "đúng" → 6/10. Chấm level 2 (marker): chỉ 0/5 có marker → 0/10. Thực tế: 2/10 (đúng doc nhưng sai section = 1đ). **Đây chính là phát hiện đáng giá: HeadingChunker lấy đúng tài liệu nhưng mock embedder không chọn đúng section.**
 
 **Lọc bằng metadata có giúp ích không? Ở câu hỏi nào?**
-> **Có, rõ rệt ở Q5**: Không filter → top-3 toàn `dormitory`, `library-services-full`, `scholarship` (audience=student/all). Có filter `audience=faculty` → chuyển sang `faculty-teaching-guidelines` — **metadata filter là quyết định**. Q2 filter `audience=student` loại được docs `audience=all` (library-services, academic-calendar) khỏi top-3, nhưng mock embedder vẫn không match đúng nội dung nên chưa đủ.
+> **Có, rõ rệt ở Q5**: Không filter → top-3 toàn `dormitory` (audience=student). Có filter `audience=faculty` → chuyển sang đúng `admissions` (audience=faculty) — **metadata filter là quyết định**. Q2 filter `audience=student` loại được docs (audience=faculty) khỏi top-3, nhưng mock embedder vẫn không match đúng nội dung nên chưa đủ.
 
 ### Phân tích lỗi (Failure Analysis)
 
-**Failure case 1 — Q4: Top-3 đúng tài liệu nhưng sai section**
-- Câu hỏi: "Quy trình phúc khảo gồm mấy bước?"
-- Top-1 là `grade-review#3` (Lệ phí phúc khảo) thay vì `grade-review#4` (Quy trình xử lý)
-- Nguyên nhân: Mock embedder hash-based → các section trong cùng doc có score gần ngẫu nhiên → section nào lọt top-3 phụ thuộc vào hash, không phải ngữ nghĩa
-- Đề xuất: Dùng embedder thật (sentence-transformers multilingual). Hoặc: overlap giữa sections trong HeadingChunker để "10 ngày" xuất hiện ở nhiều chunk hơn
+**Failure case 1 — Q3: Top-3 đúng tài liệu nhưng sai section**
+- Câu hỏi: "Khu bếp chung ở KTX có những thiết bị gì?"
+- Top-1 là `dormitory#0` (Heading title) thay vì `dormitory#3` (Tiện ích chung chứa lò vi sóng, bếp điện)
+- Nguyên nhân: Mock embedder hash-based → các section trong cùng doc có score gần ngẫu nhiên.
+- Đề xuất: Dùng embedder thật (sentence-transformers multilingual).
 
 **Failure case 2 — Q1: Retrieval hoàn toàn sai tài liệu**
-- Top-1 là `scholarship#1` thay vì `tuition-fees`
-- Nguyên nhân: Cosine trên mock hash đo "giống chuỗi ký tự" không phải "giống nghĩa" → "học phí" và "học bổng" là hai chuỗi hoàn toàn khác
-- Đề xuất: Embedder thật sẽ hiểu "học phí" ≈ "tín chỉ" ≈ "đóng tiền"
+- Câu hỏi: "Khi nào sinh viên VinUni phải đóng học phí?"
+- Top-1 là `library#0` thay vì `tuition`
+- Nguyên nhân: Cosine trên mock hash đo "giống chuỗi ký tự" không phải "giống nghĩa" → hash chuỗi query vô tình gần với hash của nội dung thư viện.
+- Đề xuất: Embedder thật sẽ hiểu ngữ nghĩa của "đóng học phí".
 
 ---
 

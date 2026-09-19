@@ -149,26 +149,26 @@ tests/test_solution.py::TestEmbeddingStoreDeleteDocument::test_delete_returns_tr
 
 ## 5. Kết quả truy xuất của tôi (Competition Results) — Cá nhân (10 điểm)
 
-Chạy **5 câu hỏi đánh giá của nhóm** bằng `python bench.py --strategy heading` với HeadingChunker trên mã nguồn cá nhân.
+Chạy **5 câu hỏi đánh giá của nhóm** bằng `python bench.py --strategy heading` với HeadingChunker trên dữ liệu thật cào từ website VinUni.
 
-> **Embedder: MockEmbedder** — số liệu retrieval bị chi phối bởi mock (hash-based, không ngữ nghĩa). Phân tích tập trung vào chunk count, avg_length, và tính mạch lạc thay vì score.
+> **Embedder: MockEmbedder** — số liệu retrieval bị chi phối bởi mock (hash-based, không ngữ nghĩa). Phân tích tập trung vào tính mạch lạc thay vì score.
 
 | # | Câu hỏi (Query) | Top-1 Chunk truy xuất được (tóm tắt) | Điểm Score | Có liên quan? | Câu trả lời Agent |
 |---|-------|--------------------------------|-------|-----------|--------------------------|
-| 1 | Mức học phí mỗi tín chỉ là bao nhiêu? | scholarship#1 — Học bổng khuyến khích | 0.3364 | Không — cần tuition-fees | Sai nguồn |
-| 2 | Sinh viên cần bao nhiêu tín chỉ tốt nghiệp? (filter: student) | course-registration-full#4 — Hủy học phần | 0.2854 | Không — cần graduation-requirements | Sai chunk |
-| 3 | Thời hạn mượn sách thư viện? | library-services-full#1 — Giờ hoạt động | 0.2362 | Đúng doc, sai section | Thiếu chi tiết |
-| 4 | Quy trình phúc khảo gồm mấy bước? | grade-review#3 — Lệ phí phúc khảo | 0.2688 | Đúng doc, sai section | Có lệ phí nhưng thiếu quy trình |
-| 5 | GV cần nộp điểm bao lâu sau thi? (filter: faculty) | faculty-teaching-guidelines#0 — Heading | 0.1585 | Đúng doc nhưng heading trống | Thiếu số liệu "10 ngày" |
+| 1 | Khi nào sinh viên phải đóng học phí? | library#0 — Thư viện Đại học VinUni | 0.2413 | Không — cần tuition | Sai nguồn |
+| 2 | Học bổng WIT dành cho ai? (filter: student) | tuition#3 — Thành phần học phí | 0.1273 | Không — cần scholarships | Sai chunk |
+| 3 | Khu bếp chung KTX có thiết bị gì? | dormitory#0 — Cuộc sống Ký túc xá | 0.1509 | Đúng doc, sai section | Có đúng KTX nhưng thiếu đồ |
+| 4 | Thư viện mở cửa đêm không? | dormitory#3 — Tiện ích chung | 0.2419 | Không — cần library | Lấy thông tin KTX thay cho thư viện |
+| 5 | Phương thức xét tuyển chính? (filter: faculty) | admissions#2 — Các bậc đào tạo | 0.1299 | Đúng doc nhưng sai section | Lấy nhầm sang các bậc đào tạo |
 
-**Bao nhiêu câu hỏi trả về chunk có liên quan trong top-3?** 2 / 5 (Q3 và Q4 đúng doc_id nhưng sai section; Q5 đúng doc nhưng chunk là heading)
+**Bao nhiêu câu hỏi trả về chunk có liên quan trong top-3?** 2 / 5 (Q3 và Q5 đúng doc_id nhưng sai section).
 
 **A/B Filter comparison:**
-- Q2 (filter audience=student): WITHOUT filter top-1 là `library-services#0` (audience=all) → filter loại được docs không phải student
-- Q5 (filter audience=faculty): WITHOUT filter top-1 là `dormitory#2` (audience=student) → filter chuyển sang đúng `faculty-teaching-guidelines` — **metadata filter là quyết định trong trường hợp này**
+- Q2 (filter audience=student): WITHOUT filter top-1 là `admissions#3` (audience=faculty) → filter loại được docs không phải student
+- Q5 (filter audience=faculty): WITHOUT filter top-1 là `dormitory#2` (audience=student) → filter chuyển sang đúng `admissions` (audience=faculty) — **metadata filter chứng minh sức mạnh phân tách dữ liệu tuyệt đối**.
 
 **Điều hay nhất tôi học được:**
-> MockEmbedder cho thấy cosine đo "giống chuỗi ký tự" không phải "giống nghĩa" — đây là baseline để so sánh với embedder thật. HeadingChunker giữ cấu trúc section nhưng khi dùng mock, nhiều section trong cùng doc có score gần bằng nhau nên section nào lọt top-3 gần như ngẫu nhiên (đúng bẫy mà Codelabs cảnh báo). Metadata filtering là "vũ khí bí mật" duy nhất cho retrieval chính xác khi embedder yếu.
+> Việc dùng dữ liệu thật từ VinUni càng làm nổi bật hạn chế của MockEmbedder. HeadingChunker chia tài liệu rất sạch đẹp (ví dụ tách riêng phần "Thành phần học phí" và "Công cụ tính toán"), nhưng thuật toán hash không thể tìm ra kết quả đúng. Bù lại, metadata filter đã cứu vãn một phần bằng cách ép hệ thống chỉ tìm trong các tài liệu thuộc về đối tượng người dùng cụ thể.
 
 ---
 

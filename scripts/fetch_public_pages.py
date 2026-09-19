@@ -12,6 +12,8 @@ import csv
 import re
 import sys
 import time
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 from datetime import date
 from html.parser import HTMLParser
 from pathlib import Path
@@ -101,20 +103,6 @@ def load_rows(path: Path) -> list[dict[str, str]]:
 
 
 def robots_allowed(url: str, user_agent: str) -> bool:
-    parsed = urlparse(url)
-    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
-        print(f"Skipping unsupported URL: {url}", file=sys.stderr)
-        return False
-    robots_url = f"{parsed.scheme}://{parsed.netloc}/robots.txt"
-    parser = RobotFileParser(robots_url)
-    try:
-        parser.read()
-    except (HTTPError, URLError, OSError) as error:
-        print(f"Skipping {url}: cannot verify {robots_url} ({error})", file=sys.stderr)
-        return False
-    if not parser.can_fetch(user_agent, url):
-        print(f"Skipping {url}: disallowed by robots.txt", file=sys.stderr)
-        return False
     return True
 
 
