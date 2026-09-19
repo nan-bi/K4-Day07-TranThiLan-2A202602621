@@ -1,0 +1,12 @@
+doc_id,file_path,title,source_url,retrieved_at,document_version,license_or_permission
+academic-calendar,data/university/academic-calendar.md,Lịch trình học vụ năm học 2026-2027,https://example.edu/hoc-vu/lich-trinh,2026-09-15,2026.2,public-source
+course-registration,data/university/course-registration.md,Đăng ký học phần,https://example.edu/hoc-vu/dang-ky-hoc-phan,2026-08-02,2026.1,public-source
+course-registration-full,data/university/course-registration-full.md,Quy định đăng ký học phần chi tiết,https://example.edu/hoc-vu/dang-ky-hoc-phan-chi-tiet,2026-09-15,2026.2,public-source
+dormitory,data/university/dormitory.md,Quy định ký túc xá,https://example.edu/sinh-vien/ky-tuc-xa,2026-09-15,2026.2,public-source
+faculty-teaching-guidelines,data/university/faculty-teaching-guidelines.md,Hướng dẫn giảng dạy cho giảng viên,https://example.edu/giang-vien/huong-dan-giang-day,2026-09-15,2026.2,public-source
+grade-review,data/university/grade-review.md,Quy trình phúc khảo điểm thi,https://example.edu/hoc-vu/phuc-khao,2026-09-15,2026.2,public-source
+graduation-requirements,data/university/graduation-requirements.md,Điều kiện tốt nghiệp,https://example.edu/hoc-vu/tot-nghiep,2026-09-15,2026.2,public-source
+library-services,data/university/library-services.md,Dịch vụ thư viện,https://example.edu/thu-vien/dich-vu,2026-08-02,2026.1,public-source
+library-services-full,data/university/library-services-full.md,Dịch vụ thư viện chi tiết,https://example.edu/thu-vien/dich-vu-chi-tiet,2026-09-15,2026.2,public-source
+scholarship,data/university/scholarship.md,Chính sách học bổng,https://example.edu/hoc-vu/hoc-bong,2026-09-15,2026.2,public-source
+tuition-fees,data/university/tuition-fees.md,Quy định học phí và miễn giảm,https://example.edu/tai-chinh/hoc-phi,2026-09-15,2026.2,public-source

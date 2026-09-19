@@ -1,15 +1,14 @@
 ---
 doc_id: library-services
 title: Dịch vụ thư viện
-audience: all               # student | faculty | staff | all
+audience: all
 department: library
+category: service
 language: vi
 source_url: https://example.edu/thu-vien/dich-vu
 retrieved_at: 2026-08-02
 document_version: "2026.1"
 ---
-
-> Khối metadata phía trên là **template mẫu** cho K4 — thay `source_url`/`retrieved_at`/`document_version` bằng nguồn công khai thật trước khi dùng làm benchmark.
 
 # Dịch vụ thư viện (dữ liệu khởi động)
 

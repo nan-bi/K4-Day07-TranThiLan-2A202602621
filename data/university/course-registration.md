@@ -1,15 +1,14 @@
 ---
 doc_id: course-registration
 title: Đăng ký học phần
-audience: student            # student | faculty | staff | all
+audience: student
 department: academic-affairs
+category: registration
 language: vi
 source_url: https://example.edu/hoc-vu/dang-ky-hoc-phan
 retrieved_at: 2026-08-02
 document_version: "2026.1"
 ---
-
-> Khối metadata phía trên là **template mẫu** cho K4 (bắt buộc: `audience` + `source_url` + `retrieved_at` + `document_version`, cùng ít nhất một trường hữu ích khác như `department`). Thay bằng nguồn công khai thật của nhóm trước khi dùng làm benchmark.
 
 # Đăng ký học phần (dữ liệu khởi động)
 
