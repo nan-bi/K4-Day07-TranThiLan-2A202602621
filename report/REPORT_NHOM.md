@@ -1,6 +1,6 @@
 # Báo Cáo Nhóm — Lab 7: Embedding & Vector Store
 
-**Nhóm:** K4-L3A
+**Nhóm:** G17
 **Thành viên:** Trần Thị Lan (2A202602621)
 **Ngày:** 2026-09-19
 
