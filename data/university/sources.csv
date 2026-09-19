@@ -1,6 +1,0 @@
-doc_id,file_path,title,source_url,retrieved_at,document_version,license_or_permission
-tuition,data/university/tuition.md,Học phí và Hỗ trợ tài chính VinUni,https://vinuni.edu.vn/hoc-phi-ho-tro-tai-chinh/,2026-09-19,2026.1,public-source
-scholarships,data/university/scholarships.md,Chương trình Học bổng VinUni,https://vinuni.edu.vn/hoc-bong-tai-tro-dao-tao-tu-tap-doan-vingroup/,2026-09-19,2026.1,public-source
-dormitory,data/university/dormitory.md,Cuộc sống Ký túc xá VinUni,https://vinuni.edu.vn/cuoc-song-ky-tuc-xa/,2026-09-19,2026.1,public-source
-library,data/university/library.md,Thư viện Đại học VinUni,https://library.vinuni.edu.vn/,2026-09-19,2026.1,public-source
-admissions,data/university/admissions.md,Thông tin Tuyển sinh VinUni,https://admissions.vinuni.edu.vn/,2026-09-19,2026.1,public-source

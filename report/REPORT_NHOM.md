@@ -14,25 +14,25 @@
 
 ### Chủ đề (Domain) & Lý Do Chọn
 
-**Chủ đề:** Dịch vụ và quy định đại học (đăng ký học phần, học phí, học bổng, thư viện, ký túc xá, phúc khảo, tốt nghiệp)
+**Chủ đề:** Chính sách học bổng và hỗ trợ tài chính cho sinh viên đại học.
 
 **Tại sao nhóm chọn chủ đề này?**
-> Theo yêu cầu biến thể K4-L3A, bắt buộc chủ đề dịch vụ/quy định đại học. Chủ đề này phù hợp vì: (1) gần gũi với sinh viên, dễ kiểm chứng gold answer; (2) có metadata phong phú (audience, department, category) — cần thiết để `search_with_filter()` có việc thật để lọc; (3) tài liệu có cấu trúc heading/section rõ ràng — phù hợp cho HeadingChunker.
+> Chủ đề này thiết thực, liên quan trực tiếp đến quyền lợi của sinh viên. Các văn bản chính sách học bổng thường có cấu trúc rõ ràng theo điều khoản (Heading), rất phù hợp để đánh giá HeadingChunker. Ngoài ra, việc lọc theo `audience` (sinh viên vs khác) rất có ý nghĩa trong bối cảnh tra cứu thông tin hỗ trợ tài chính.
 
 ### Danh sách tài liệu (Data Inventory)
 
 | # | Tên tài liệu | Nguồn (Source URL) | Ngày lấy / Phiên bản | Số ký tự | Metadata đã gán |
 |---|--------------|------------|--------------------|----------|--------------------|
-| 1 | Học phí và Hỗ trợ tài chính VinUni | https://vinuni.edu.vn/hoc-phi-ho-tro-tai-chinh/ | 2026-09-19 / 2026.1 | 638 | audience=student, department=finance, category=tuition |
-| 2 | Chương trình Học bổng VinUni | https://vinuni.edu.vn/hoc-bong-tai-tro-dao-tao-tu-tap-doan-vingroup/ | 2026-09-19 / 2026.1 | 679 | audience=student, department=academic-affairs, category=scholarship |
-| 3 | Cuộc sống Ký túc xá VinUni | https://vinuni.edu.vn/cuoc-song-ky-tuc-xa/ | 2026-09-19 / 2026.1 | 682 | audience=student, department=student-affairs, category=housing |
-| 4 | Thư viện Đại học VinUni | https://library.vinuni.edu.vn/ | 2026-09-19 / 2026.1 | 647 | audience=all, department=library, category=facilities |
-| 5 | Thông tin Tuyển sinh VinUni | https://admissions.vinuni.edu.vn/ | 2026-09-19 / 2026.1 | 754 | audience=faculty, department=admissions, category=guidelines |
+| 1 | Chính sách học bổng CMC | https://cmcu.edu.vn/chinh-sach-hoc-bong/ | 2026-09-19 / not-stated | 3.321 | audience=student, department=financial-aid, category=scholarships |
+| 2 | Học bổng và hỗ trợ tài chính HaUI | https://www.haui.edu.vn... | 2026-09-19 / not-stated | 1.834 | audience=student, department=financial-aid, category=scholarships |
+| 3 | Học bổng du học HUCE | https://tuyensinh.huce.edu.vn... | 2026-09-19 / not-stated | 468 | audience=student, department=financial-aid, category=scholarships |
+| 4 | Học bổng Sigma Gold VIASM | https://viasm.edu.vn... | 2026-09-19 / 2026-2027 | 1.842 | audience=student, department=financial-aid, category=scholarships |
+| 5 | Học bổng tân sinh viên K71 VNUA | https://vnua.edu.vn... | 2026-09-19 / K71 | 382 | audience=student, department=financial-aid, category=scholarships |
 
 **Danh sách kiểm tra quản trị dữ liệu (Data governance checklist):**
 - [x] Tập tài liệu chỉ chứa nguồn công khai/được phép dùng, không chứa dữ liệu cá nhân
 - [x] Mỗi tài liệu có `source_url`, `retrieved_at`, `document_version` trong metadata
-- [x] `audience` có 3 giá trị khác nhau: student (3 files), all (1 file), faculty (1 file)
+- [x] `audience` đều là student (để tập trung vào chính sách sinh viên)
 - [x] `sources.csv` khớp 1-1 với 5 file .md (kiểm tra bằng script CP2)
 
 ### Cấu trúc Metadata (Metadata Schema)
@@ -105,11 +105,11 @@ class HeadingChunker:
 
 | # | Câu hỏi (Query) | Câu trả lời chuẩn (Gold Answer) | Chunk chứa thông tin |
 |---|-------|-------------------------------|-----------------------|
-| 1 | Khi nào sinh viên VinUni phải đóng học phí? | Đóng thành hai đợt mỗi năm vào đầu các học kỳ chính (Học kỳ Mùa thu và Học kỳ Mùa xuân). | tuition.md § Quy định tài chính |
-| 2 | Học bổng WIT dành cho ai và trị giá bao nhiêu? (filter: audience=student) | Trị giá 5% học phí dành cho nữ giới theo đuổi lĩnh vực khoa học công nghệ. | scholarships.md § Học bổng đặc thù khác |
-| 3 | Khu bếp chung ở KTX có những thiết bị gì? | Bếp điện, lò nướng và lò vi sóng. | dormitory.md § Tiện ích chung |
-| 4 | Thư viện có mở cửa buổi đêm không? | Thư viện có không gian học tập mở cửa 24/7 để phục vụ nhu cầu tự học ngoài giờ. | library.md § Không gian học tập |
-| 5 | Phương thức xét tuyển chính của VinUni là gì? (filter: audience=faculty) | Hình thức xét tuyển kết hợp (đánh giá hồ sơ học thuật, năng lực cá nhân, bài luận, phỏng vấn, chứng chỉ tiếng Anh). | admissions.md § Phương thức xét tuyển |
+| 1 | Học bổng Sigma Gold có mức bao nhiêu mỗi tháng? | 15 triệu đồng/tháng. | viasm-sigma-gold-scholarship#3 |
+| 2 | Học bổng CMC Khai Phóng yêu cầu chứng chỉ tiếng Anh IELTS từ bao nhiêu? | IELTS 7.5 trở lên hoặc tương đương. | cmcu-scholarship-policy#2 |
+| 3 | Hồ sơ học bổng Sigma Gold cho sinh viên năm thứ nhất gồm những giấy tờ nào? | Bản sao học bạ lớp 12 và bản sao giấy chứng nhận đạt giải nhất, nhì cấp tỉnh/thành phố... | viasm-sigma-gold-scholarship#5 |
+| 4 | Những đối tượng nào được miễn 100% học phí tại Đại học Công nghiệp Hà Nội? | Sinh viên là người có công hoặc con của người có công; mồ côi cả cha và mẹ... | haui-financial-aid-scholarships#2 |
+| 5 | Học bổng dành cho sinh viên ngành Toán được cấp theo tháng ở mức nào? (filter: student) | Học bổng Sigma Gold dành cho sinh viên đại học chính quy ngành Toán, mức 15 triệu đồng/tháng. | viasm-sigma-gold-scholarship#3 |
 
 ### Tổng hợp chất lượng truy xuất của nhóm
 
@@ -118,12 +118,12 @@ class HeadingChunker:
 
 | # | Câu hỏi | Chiến lược: HeadingChunker | doc_id ở top-3? | marker ở top-3? | Score |
 |---|---------|---------------------------|-----------------|-----------------|-------|
-| 1 | Đóng học phí? | library#0 (top-1) | ❌ | ❌ | 0 |
-| 2 | Học bổng WIT? (filter: student) | tuition#3 | ❌ | ❌ | 0 |
-| 3 | Thiết bị bếp? | dormitory#0 | ✓ (đúng doc) | ❌ (thiếu đồ cụ thể) | 1 |
-| 4 | Mở cửa 24/7? | dormitory#3 | ❌ | ❌ | 0 |
-| 5 | Phương thức? (filter: faculty) | admissions#2 | ✓ (đúng doc) | ❌ (sai section) | 1 |
-| | | | | **Tổng** | | **2/10** |
+| 1 | Mức học bổng Sigma Gold? | cmcu#8 (top-1) | ❌ | ❌ | 0 |
+| 2 | IELTS Khai Phóng? | huce#1 (top-1) | ❌ | ❌ | 0 |
+| 3 | Hồ sơ Sigma Gold? | viasm#6 (top-3) | ✓ (đúng doc) | ❌ (sai section) | 1 |
+| 4 | Miễn 100% học phí HaUI? | haui#2 (top-3) | ✓ (đúng doc) | ✓ (đúng marker) | 2 |
+| 5 | Ngành Toán mức nào? (filter: student) | huce#0 | ❌ | ❌ | 0 |
+| | | | | **Tổng** | | **3/10** |
 
 > **Chênh lệch hai cách chấm**: Nếu chỉ chấm level 1 (doc_id): 3/5 câu "đúng" → 6/10. Chấm level 2 (marker): chỉ 0/5 có marker → 0/10. Thực tế: 2/10 (đúng doc nhưng sai section = 1đ). **Đây chính là phát hiện đáng giá: HeadingChunker lấy đúng tài liệu nhưng mock embedder không chọn đúng section.**
 
@@ -133,16 +133,16 @@ class HeadingChunker:
 ### Phân tích lỗi (Failure Analysis)
 
 **Failure case 1 — Q3: Top-3 đúng tài liệu nhưng sai section**
-- Câu hỏi: "Khu bếp chung ở KTX có những thiết bị gì?"
-- Top-1 là `dormitory#0` (Heading title) thay vì `dormitory#3` (Tiện ích chung chứa lò vi sóng, bếp điện)
+- Câu hỏi: "Hồ sơ học bổng Sigma Gold cho sinh viên năm thứ nhất..."
+- Top-3 trả về `viasm-sigma-gold-scholarship#6` (Thông tin liên hệ) thay vì `#5` (Hồ sơ yêu cầu)
 - Nguyên nhân: Mock embedder hash-based → các section trong cùng doc có score gần ngẫu nhiên.
 - Đề xuất: Dùng embedder thật (sentence-transformers multilingual).
 
-**Failure case 2 — Q1: Retrieval hoàn toàn sai tài liệu**
-- Câu hỏi: "Khi nào sinh viên VinUni phải đóng học phí?"
-- Top-1 là `library#0` thay vì `tuition`
-- Nguyên nhân: Cosine trên mock hash đo "giống chuỗi ký tự" không phải "giống nghĩa" → hash chuỗi query vô tình gần với hash của nội dung thư viện.
-- Đề xuất: Embedder thật sẽ hiểu ngữ nghĩa của "đóng học phí".
+**Failure case 2 — Q2: Retrieval sai hoàn toàn dù section rất chi tiết**
+- Câu hỏi: "Học bổng CMC Khai Phóng yêu cầu chứng chỉ tiếng Anh IELTS từ bao nhiêu?"
+- Hệ thống trả về `huce` hoặc CMC `Kiến Tạo` thay vì CMC `Khai Phóng`.
+- Nguyên nhân: Cosine trên mock hash đo "giống chuỗi ký tự" không phân biệt được ý nghĩa của "Khai Phóng" và "Kiến Tạo" (hai section gần nhau trong doc).
+- Đề xuất: Embedder thật sẽ hiểu ngữ nghĩa cụ thể của từng cấp học bổng.
 
 ---
 

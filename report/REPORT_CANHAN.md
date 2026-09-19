@@ -155,20 +155,19 @@ Chạy **5 câu hỏi đánh giá của nhóm** bằng `python bench.py --strate
 
 | # | Câu hỏi (Query) | Top-1 Chunk truy xuất được (tóm tắt) | Điểm Score | Có liên quan? | Câu trả lời Agent |
 |---|-------|--------------------------------|-------|-----------|--------------------------|
-| 1 | Khi nào sinh viên phải đóng học phí? | library#0 — Thư viện Đại học VinUni | 0.2413 | Không — cần tuition | Sai nguồn |
-| 2 | Học bổng WIT dành cho ai? (filter: student) | tuition#3 — Thành phần học phí | 0.1273 | Không — cần scholarships | Sai chunk |
-| 3 | Khu bếp chung KTX có thiết bị gì? | dormitory#0 — Cuộc sống Ký túc xá | 0.1509 | Đúng doc, sai section | Có đúng KTX nhưng thiếu đồ |
-| 4 | Thư viện mở cửa đêm không? | dormitory#3 — Tiện ích chung | 0.2419 | Không — cần library | Lấy thông tin KTX thay cho thư viện |
-| 5 | Phương thức xét tuyển chính? (filter: faculty) | admissions#2 — Các bậc đào tạo | 0.1299 | Đúng doc nhưng sai section | Lấy nhầm sang các bậc đào tạo |
+| 1 | Học bổng Sigma Gold mức bao nhiêu? | cmcu-scholarship-policy#8 — Chính sách ưu đãi | 0.2639 | Không — cần viasm | Sai nguồn |
+| 2 | CMC Khai Phóng yêu cầu IELTS? | huce-study-abroad-scholarships#1 — Ghi chú | 0.2119 | Không — cần cmcu#2 | Sai chunk |
+| 3 | Hồ sơ học bổng Sigma Gold? | huce-study-abroad-scholarships#0 — Học bổng du học | 0.1649 | Không — cần viasm#5 | Sai chunk |
+| 4 | Miễn 100% học phí HaUI? | cmcu-scholarship-policy#9 — Ưu đãi iPad | 0.2330 | Không — cần haui#2 | Sai nguồn (top 3 mới đúng) |
+| 5 | Sinh viên ngành Toán mức nào? (filter: student) | huce-study-abroad-scholarships#0 — Học bổng du học | 0.2695 | Không — cần viasm#3 | Sai nguồn |
 
-**Bao nhiêu câu hỏi trả về chunk có liên quan trong top-3?** 2 / 5 (Q3 và Q5 đúng doc_id nhưng sai section).
+**Bao nhiêu câu hỏi trả về chunk có liên quan trong top-3?** 2 / 5 (Q3 top-3 là `viasm`, Q4 top-3 là `haui`).
 
 **A/B Filter comparison:**
-- Q2 (filter audience=student): WITHOUT filter top-1 là `admissions#3` (audience=faculty) → filter loại được docs không phải student
-- Q5 (filter audience=faculty): WITHOUT filter top-1 là `dormitory#2` (audience=student) → filter chuyển sang đúng `admissions` (audience=faculty) — **metadata filter chứng minh sức mạnh phân tách dữ liệu tuyệt đối**.
+- Q5 (filter audience=student): Dù có filter thì mock embedder vẫn bị nhiễu do điểm cosine ngẫu nhiên, kết quả trả về `huce` thay vì `viasm` vì cả hai đều có `audience=student`.
 
 **Điều hay nhất tôi học được:**
-> Việc dùng dữ liệu thật từ VinUni càng làm nổi bật hạn chế của MockEmbedder. HeadingChunker chia tài liệu rất sạch đẹp (ví dụ tách riêng phần "Thành phần học phí" và "Công cụ tính toán"), nhưng thuật toán hash không thể tìm ra kết quả đúng. Bù lại, metadata filter đã cứu vãn một phần bằng cách ép hệ thống chỉ tìm trong các tài liệu thuộc về đối tượng người dùng cụ thể.
+> Việc dùng dữ liệu thật các quỹ học bổng càng làm nổi bật hạn chế của MockEmbedder. HeadingChunker chia tài liệu rất sạch đẹp (ví dụ tách riêng các loại học bổng Khai Phóng, Sáng Tạo, Kiến Tạo của CMC), nhưng thuật toán hash không thể tìm ra kết quả đúng. Ở câu Q2 tìm học bổng Khai Phóng, hệ thống trả về Kiến Tạo (sai section) hoặc HUCE. Metadata filter giúp thu hẹp không gian tìm kiếm nhưng không bù đắp được sự yếu kém của MockEmbedder.
 
 ---
 
