@@ -1,12 +1,20 @@
 # Báo Cáo Nhóm — Lab 7: Embedding & Vector Store
 
-**Nhóm:** G17
-**Thành viên:** Trần Thị Lan (2A202602621)
+**Nhóm:** Nhóm 17
+**Thành viên:**
+- Đoàn Anh Quân — 2A202602803
+- Nguyễn Phương Nam - 2A202602869
+- Trần Thu Phương - 2A202602734	
+- Đỗ Lê Việt Anh - 2A202602491
+- Trần Thị Lan — 2A202602621
+
 **Ngày:** 2026-09-19
 
 > **Nộp 1 bản / nhóm.** Phần cá nhân (hướng tiếp cận, kết quả riêng, dự đoán…) mỗi thành viên nộp riêng trong `REPORT_CANHAN.md`. Chi tiết thang điểm: `docs/SCORING.md`.
 
 **Tổng điểm phần nhóm: 40** = Lựa chọn tài liệu (10) + Thiết kế chiến lược (15) + Chất lượng truy xuất (10) + Thuyết trình (5).
+
+> ⚠️ **Ghi chú tổng hợp:** Báo cáo này được tổng hợp từ code + `REPORT_CANHAN.md` thực tế của cả 5 thành viên (folder `nam/`, `phuong/`, `vietanh/`, `lan/`, và project chính của Quân). Ba thành viên Nam/Phương/Việt Anh chạy thử nghiệm trên corpus `data/hoc-bong/` (chủ đề học bổng) với **bộ câu hỏi tự soạn riêng của từng người**; Lan chạy trên một corpus **dịch vụ đại học** hoàn toàn khác (học phí, đăng ký học phần, thư viện, phúc khảo, hướng dẫn giảng viên, ký túc xá) mà cô tự thu thập, chưa nộp file dữ liệu; còn Quân xây dựng `bench.py` với bộ 5 câu hỏi chung chạy trên corpus `data/scholarship/`. Báo cáo chọn `data/scholarship/` + `bench.py::QUERIES` làm **bộ chính thức của nhóm** (đầy đủ metadata, có sẵn code tái lập được) — xem khung "Cần hoàn thiện trước khi nộp" ở mỗi mục để biết phần nào cần Nam/Phương/Việt Anh/Lan chạy lại.
 
 ---
 
@@ -14,152 +22,208 @@
 
 ### Chủ đề (Domain) & Lý Do Chọn
 
-**Chủ đề:** Chính sách học bổng và hỗ trợ tài chính cho sinh viên đại học.
+**Chủ đề:** Học bổng & hỗ trợ tài chính cho sinh viên tại các trường đại học Việt Nam.
 
 **Tại sao nhóm chọn chủ đề này?**
-> Chủ đề này thiết thực, liên quan trực tiếp đến quyền lợi của sinh viên. Các văn bản chính sách học bổng thường có cấu trúc rõ ràng theo điều khoản (Heading), rất phù hợp để đánh giá HeadingChunker. Ngoài ra, việc lọc theo `audience` (sinh viên vs khác) rất có ý nghĩa trong bối cảnh tra cứu thông tin hỗ trợ tài chính.
+> Đây là thông tin công khai, mỗi trường đăng tải theo một cấu trúc mục rõ ràng (đối tượng, mức cấp, hồ sơ, thời gian) nên rất hợp để so sánh chiến lược chunking theo heading. Ngoài ra, cùng một trang nguồn (HUCE) tách học bổng ra nhiều bài theo **đối tượng** (`student` / `faculty` / `staff`), tạo sẵn tình huống bắt buộc phải lọc metadata mới trả lời đúng — đúng yêu cầu của `K4_VARIANT.md`.
 
 ### Danh sách tài liệu (Data Inventory)
 
+Corpus chính thức: `data/scholarship/` (11 tài liệu, khai báo tại `data/scholarship/sources.csv`).
+
 | # | Tên tài liệu | Nguồn (Source URL) | Ngày lấy / Phiên bản | Số ký tự | Metadata đã gán |
-|---|--------------|------------|--------------------|----------|--------------------|
-| 1 | Chính sách học bổng CMC | https://cmcu.edu.vn/chinh-sach-hoc-bong/ | 2026-09-19 / not-stated | 3.321 | audience=student, department=financial-aid, category=scholarships |
-| 2 | Học bổng và hỗ trợ tài chính HaUI | https://www.haui.edu.vn... | 2026-09-19 / not-stated | 1.834 | audience=student, department=financial-aid, category=scholarships |
-| 3 | Học bổng du học HUCE | https://tuyensinh.huce.edu.vn... | 2026-09-19 / not-stated | 468 | audience=student, department=financial-aid, category=scholarships |
-| 4 | Học bổng Sigma Gold VIASM | https://viasm.edu.vn... | 2026-09-19 / 2026-2027 | 1.842 | audience=student, department=financial-aid, category=scholarships |
-| 5 | Học bổng tân sinh viên K71 VNUA | https://vnua.edu.vn... | 2026-09-19 / K71 | 382 | audience=student, department=financial-aid, category=scholarships |
+|---|--------------|------------|--------------------|----------|-----------------|
+| 1 | `haui-financial-aid-scholarships` | haui.edu.vn/.../ho-tro-tai-chinh-va-hoc-bong-danh-cho-sinh-vien-haui | 2026-09-19 / not-stated | 11 696 | `audience=student`, `department=financial-aid`, `category=scholarships`, `language=vi` |
+| 2 | `huce-canada-shortterm-faculty` | tuyensinh.huce.edu.vn/hoc-bong-du-hoc | 2026-09-19 / not-stated | 784 | `audience=faculty`, `department=financial-aid` |
+| 3 | `huce-jds-japan-staff` | tuyensinh.huce.edu.vn/hoc-bong-du-hoc | 2026-09-19 / not-stated | 819 | `audience=staff`, `department=financial-aid` |
+| 4 | `huce-study-abroad-scholarships` | tuyensinh.huce.edu.vn/hoc-bong-du-hoc | 2026-09-19 / not-stated | 24 043 | `audience=student`, `department=financial-aid` |
+| 5 | `hust-financial-aid-for-students` | ts.hust.edu.vn/tin-tuc/ho-tro-tai-chinh-cho-sinh-vien | 2026-09-19 / 2025 | 3 832 | `audience=student`, `department=financial-aid` |
+| 6 | `hust-postgrad-research-scholarships` | ts.hust.edu.vn/tin-tuc/hoc-bong-thac-s-nghien-cuu-dhbkhn | 2026-09-19 / not-stated | 3 899 | `audience=faculty`, `department=research-affairs` |
+| 7 | `iuoss-jensen-huang-scholarship` | iuoss.com/chuong-trinh-hoc-bong-jensen-huang-nam-2025 | 2026-09-19 / 2025 | 9 322 | `audience=student`, `department=financial-aid` |
+| 8 | `lstf-dinh-thien-ly-scholarship` | lstf.org.vn/.../hoc-bong-dinh-thien-ly | 2026-09-19 / not-stated | 18 647 | `audience=student`, `department=financial-aid` |
+| 9 | `ued-postgrad-scholarships` | tt.ued.udn.vn/hoc-bong-thac-si-tien-si-trong-nuoc | 2026-09-19 / 2022 | 8 935 | `audience=faculty`, `department=research-affairs` |
+| 10 | `usth-vallet-scholarship-2026` | usth.edu.vn/thong-bao-trien-khai-...-hoc-bong-vallet-nam-2026 | 2026-09-19 / 2026 | 8 871 | `audience=student`, `department=financial-aid` |
+| 11 | `viasm-sigma-gold-scholarship` | viasm.edu.vn/.../hoc-bong-sigma-gold-nam-hoc-2026-2027 | 2026-09-19 / 2026-2027 | 5 202 | `audience=student`, `department=financial-aid` |
+
+Corpus phụ `data/hoc-bong/` (10 tài liệu, một phần trùng nội dung với `data/scholarship/` cộng thêm `cmcu-scholarship-policy`, `fpt-scholarships`, `vnua-k71-freshman-scholarship`) là dữ liệu Nam/Phương/Việt Anh đã dùng để thử nghiệm cá nhân trước khi nhóm chốt corpus chính thức; giữ lại làm dữ liệu dự phòng, không dùng để tính điểm chất lượng truy xuất của nhóm.
 
 **Danh sách kiểm tra quản trị dữ liệu (Data governance checklist):**
-- [x] Tập tài liệu chỉ chứa nguồn công khai/được phép dùng, không chứa dữ liệu cá nhân
-- [x] Mỗi tài liệu có `source_url`, `retrieved_at`, `document_version` trong metadata
-- [x] `audience` đều là student (để tập trung vào chính sách sinh viên)
-- [x] `sources.csv` khớp 1-1 với 5 file .md (kiểm tra bằng script CP2)
+- [x] Tập tài liệu (Corpus) chỉ chứa nguồn công khai/được phép dùng và không chứa dữ liệu cá nhân, thông tin đăng nhập hoặc tài liệu nội bộ.
+- [x] Mỗi tài liệu có `source_url`, `retrieved_at`, `document_version` (hoặc ngày hiệu lực) trong metadata.
 
 ### Cấu trúc Metadata (Metadata Schema)
 
-| Trường metadata | Kiểu | Ví dụ giá trị | Tại sao hữu ích cho truy xuất? |
+| Trường metadata | Kiểu | Ví dụ giá trị | Tại sao hữu ích cho truy xuất (retrieval)? |
 |----------------|------|---------------|-------------------------------|
-| audience | string | student / faculty / staff / all | Lọc theo đối tượng — tránh trả về quy định giảng viên khi sinh viên hỏi. Trang thư viện gộp hạn mức SV (14 ngày) lẫn GV (30 ngày) thì phải tách file để filter có việc thật |
-| department | string | academic-affairs / finance / library | Phân loại theo phòng ban — thu hẹp phạm vi tìm kiếm |
-| category | string | policy / scholarship / housing | Phân loại theo loại tài liệu — giúp lọc khi câu hỏi thuộc lĩnh vực cụ thể |
-| language | string | vi | Hỗ trợ lọc khi corpus đa ngữ |
-| source_url | string | https://example.edu/... | Truy vết nguồn — kiểm tra độ tin cậy |
-| retrieved_at | date | 2026-09-15 | Kiểm tra độ mới — ưu tiên tài liệu mới nhất |
-| document_version | string | 2026.2 / not-stated | Đảm bảo dùng phiên bản hiệu lực — không bịa số hiệu nếu nguồn không nêu |
+| `audience` | string enum | `student`, `faculty`, `staff` | Bắt buộc theo `K4_VARIANT.md`; dùng để lọc trước khi tìm khi nhiều tài liệu cùng chủ đề nhưng khác đối tượng (vd. học bổng Canada của HUCE). |
+| `department` | string | `financial-aid`, `research-affairs` | Phân biệt học bổng cấp trường/tài trợ ngoài (`financial-aid`) với học bổng sau đại học/nghiên cứu (`research-affairs`). |
+| `category` | string | `scholarships` | Cho phép mở rộng corpus sang chủ đề khác của trường (đăng ký học phần, thư viện...) mà không lẫn vào truy vấn học bổng. |
+| `language` | string | `vi` | Tất cả nguồn hiện là tiếng Việt; giữ trường này để corpus mở rộng đa ngôn ngữ về sau không phá vỡ schema. |
+| `doc_id` / `source` | string | `iuoss-jensen-huang-scholarship` | Gắn vào từng chunk để trích dẫn nguồn trong câu trả lời của agent (source traceability). |
+| `retrieved_at`, `document_version` | date / string | `2026-09-19`, `2026-2027` | Theo dõi thời hiệu quy định — học bổng thay đổi theo năm học nên cần biết bản ghi có còn hiệu lực không. |
 
 ---
 
 ## 2. Thiết kế chiến lược (Strategy Design) — Nhóm (15 điểm)
 
+> Mỗi thành viên thử **một chiến lược khác nhau** trên cùng bộ tài liệu; nhóm tổng hợp và so sánh ở đây.
+
 ### Phân tích đường cơ sở (Baseline Analysis)
 
-Chạy `ChunkingStrategyComparator().compare()` trên 3 tài liệu (đã bỏ frontmatter):
+Chạy `python bench.py --baseline` (bỏ YAML frontmatter trước khi so sánh, `chunk_size=800`, backend embedding không ảnh hưởng phần này vì chỉ đếm chunk):
 
-| Tài liệu | Chiến lược | Số chunk | Avg length | Giữ ngữ cảnh? |
-|-----------|----------|----------|------------|-------------------|
-| tuition-fees (1.382 chars) | FixedSizeChunker | 9 | 198 | ❌ Cắt giữa câu |
-| tuition-fees | SentenceChunker | 3 | 458 | ✓ Nhưng chunk quá lớn, gộp nhiều quy định |
-| tuition-fees | RecursiveChunker | 12 | 113 | ✓ Chia theo đoạn/dòng |
-| course-registration-full (1.449 chars) | FixedSizeChunker | 10 | 190 | ❌ Cắt giữa câu |
-| course-registration-full | SentenceChunker | 3 | 481 | ✓ Chunk lớn nhưng mạch lạc |
-| course-registration-full | RecursiveChunker | 11 | 130 | ✓ Chia theo heading |
-| library-services-full (1.324 chars) | FixedSizeChunker | 9 | 192 | ❌ Cắt giữa câu |
-| library-services-full | SentenceChunker | 5 | 263 | ✓ Kích thước vừa phải |
-| library-services-full | RecursiveChunker | 11 | 119 | ✓ Chia theo section |
+| Tài liệu | Chiến lược (Strategy) | Số lượng Chunk | Độ dài trung bình | Giữ được ngữ cảnh không? |
+|-----------|----------|-------------|------------|-------------------|
+| `haui-financial-aid-scholarships` | FixedSizeChunker (`fixed_size`) | 12 | 796.5 | ✗ Cắt cứng theo ký tự, không quan tâm ranh giới mục |
+| `haui-financial-aid-scholarships` | SentenceChunker (`by_sentences`) | 25 | 345.1 | ~ Giữ nguyên câu nhưng vỡ vụn nhất trong 4 chiến lược |
+| `haui-financial-aid-scholarships` | RecursiveChunker (`recursive`) | 15 | 576.9 | ✓ Ưu tiên ranh giới đoạn `\n\n` |
+| `haui-financial-aid-scholarships` | **HeadingChunker (`heading`)** | 21 | 427.5 | ✓✓ Tài liệu có nhiều mục `##`/`###` (miễn giảm, học bổng HaUI, học bổng ngành trọng điểm...), mỗi mục tách riêng |
+| `lstf-dinh-thien-ly-scholarship` | FixedSizeChunker (`fixed_size`) | 20 | 772.8 | ✗ |
+| `lstf-dinh-thien-ly-scholarship` | SentenceChunker (`by_sentences`) | 26 | 534.5 | ~ |
+| `lstf-dinh-thien-ly-scholarship` | RecursiveChunker (`recursive`) | 28 | 496.1 | ✓ |
+| `lstf-dinh-thien-ly-scholarship` | **HeadingChunker (`heading`)** | 33 | 442.5 | ✓✓ Tài liệu dài, chia mục chi tiết (mục tiêu, điều kiện, mức cấp, giải ngân...) nên heading tách hợp lý nhất |
+| `iuoss-jensen-huang-scholarship` | FixedSizeChunker (`fixed_size`) | 10 | 768.1 | ✗ |
+| `iuoss-jensen-huang-scholarship` | SentenceChunker (`by_sentences`) | 21 | 329.0 | ~ |
+| `iuoss-jensen-huang-scholarship` | RecursiveChunker (`recursive`) | 14 | 495.4 | ✓ |
+| `iuoss-jensen-huang-scholarship` | **HeadingChunker (`heading`)** | 15 | 505.1 | ✓ Ít heading hơn 2 tài liệu trên nên `heading` ≈ `recursive` (15 so với 14 chunk, độ dài xấp xỉ) |
+
+**Nhận xét:** khoảng cách giữa các chiến lược phụ thuộc vào **mức độ có cấu trúc heading của tài liệu**. Với thông báo học bổng chia mục rõ (`haui`, `lstf`), `heading` tạo chunk khớp đơn vị ngữ nghĩa mà người soạn đã định ra (mỗi loại học bổng/điều kiện một chunk). Với tài liệu ít heading hơn (`iuoss`), `HeadingChunker` gần như suy biến về `RecursiveChunker` — đúng thiết kế, vì nó ủy quyền cho `RecursiveChunker` khi một "section" theo heading vẫn dài hơn `chunk_size`.
 
 ### Chiến lược của từng thành viên
 
-**Thành viên 1 — Trần Thị Lan**
-- **Loại chiến lược:** HeadingChunker (custom, max_chunk_size=500)
-- **Mô tả & lý do chọn:** Văn bản quy định được biên soạn theo mục (`## Điều 4 — ...`), mỗi mục đã là đơn vị ngữ nghĩa trọn vẹn do người soạn chia sẵn. HeadingChunker tách trước mỗi dòng heading `#`, mỗi section thành một chunk. Section dài quá ngưỡng thì hạ xuống RecursiveChunker, và **gắn lại tiêu đề vào từng mảnh con** để mảnh thứ hai trở đi không mất ngữ cảnh "đây là mục nói về cái gì".
+**Đoàn Anh Quân — HeadingChunker (custom)**
+- **Loại chiến lược:** Heading/Section-based (tự cài đặt), có fallback sang Recursive.
+- **Mô tả & lý do chọn:** Tách văn bản theo dòng khớp `^#{1,6}\s+`, gom nội dung dưới mỗi heading thành một section; section nào vẫn dài hơn `chunk_size` thì đệ quy tiếp bằng `RecursiveChunker` và giữ lại tiêu đề heading ở đầu mỗi chunk con. Chọn chiến lược này vì corpus học bổng luôn có heading Markdown theo mục quy định (điều kiện, mức cấp, hồ sơ), heading giữ được đúng "đơn vị trả lời" mà câu hỏi thường nhắm tới.
 - **Code snippet:**
 ```python
-class HeadingChunker:
-    """Chunk theo heading/section cho tài liệu quy định."""
-    def __init__(self, max_chunk_size: int = 500) -> None:
-        self.max_chunk_size = max_chunk_size
+def chunk(self, text: str) -> list[str]:
+    lines = text.strip().splitlines()
+    sections: list[tuple[str, list[str]]] = []
+    current_heading, current_lines = "", []
+    for line in lines:
+        if re.match(r"^#{1,6}\s+", line):
+            if current_lines:
+                sections.append((current_heading, current_lines))
+            current_heading, current_lines = line.strip(), []
+        else:
+            current_lines.append(line)
+    if current_lines:
+        sections.append((current_heading, current_lines))
+    # section dài hơn chunk_size -> đệ quy tiếp bằng RecursiveChunker, giữ heading ở đầu chunk con
+```
 
-    def chunk(self, text: str) -> list[str]:
-        # Split on markdown headings, each section = 1 chunk
-        # Sub-split oversized sections via RecursiveChunker
-        # Prepend heading to each sub-chunk for context
-        ...
+**Nguyễn Phương Nam — FixedSize / Sentence / Recursive (baseline, không custom)**
+- **Loại chiến lược:** Cả ba chiến lược cơ bản (FixedSize, Sentence, Recursive), không cài thêm HeadingChunker.
+- **Mô tả & lý do chọn cho chủ đề này:** Nam tập trung hoàn thiện đúng theo đặc tả của bộ test (`_split` đệ quy theo `["\n\n", "\n", ". ", " ", ""]`, base case dừng khi `len <= chunk_size` hoặc hết separator). Việc không làm custom heading khiến chunk của Nam phụ thuộc ranh giới đoạn văn (`\n\n`) hơn là ranh giới mục — vẫn đúng nhưng không tận dụng được cấu trúc heading sẵn có trong corpus học bổng.
+
+**Trần Thu Phương — HeadingChunker (custom, độc lập với bản của Quân)**
+- **Loại chiến lược:** Heading/Section-based, tự cài đặt riêng.
+- **Mô tả & lý do chọn:** Cùng ý tưởng gom theo heading `#{1,6}`, nhưng `RecursiveChunker` nền của Phương có thêm bước "gom lên" (merge) hai lượt — vừa gom trong `_split` vừa gom lại lần nữa ở `chunk()` — nhằm giảm số chunk tí hon khi một section bị tách quá nhỏ. Chọn heading vì nhận thấy corpus học bổng luôn đánh số mục (`##`, `###`) tương ứng đúng loại câu hỏi thường gặp (mức tiền, điều kiện, hồ sơ).
+
+**Đỗ Lê Việt Anh — RecursiveChunker (tinh chỉnh, không dùng heading)**
+- **Loại chiến lược:** Recursive, không custom class mới nhưng viết lại `_split` với chú thích tiếng Việt rõ 2 pha: "đệ quy xuống sâu" theo thứ tự separator, sau đó "gom lên" các mảnh liền kề sát ngưỡng `chunk_size`.
+- **Mô tả & lý do chọn:** Ưu tiên giữ ranh giới đoạn văn (`\n\n`, `\n`) trước khi phải cắt cứng theo ký tự, phù hợp với các đoạn học bổng không phải lúc nào cũng có heading rõ ràng (vd. các đoạn giới thiệu chung ở đầu file).
+
+**Trần Thị Lan — HeadingChunker (custom, độc lập với bản của Quân/Phương)**
+- **Loại chiến lược:** Heading/Section-based (bản cài đặt độc lập thứ ba trong nhóm), có fallback sang Recursive.
+- **Mô tả & lý do chọn:** Tách theo dòng khớp `^#{1,4}\s+` (chỉ `#`/`##`, hẹp hơn `#{1,6}` của Quân/Phương) thành các cặp `(heading, body)`; section vượt `max_chunk_size` thì `body` được đưa qua `RecursiveChunker` rồi heading được gắn lại vào đầu mỗi chunk con. Chọn heading vì lý do tương tự hai bạn kia — nhưng thử nghiệm trên một **corpus khác**: dịch vụ đại học (học phí, đăng ký học phần, thư viện, phúc khảo, hướng dẫn giảng viên, ký túc xá) mà Lan tự thu thập, chưa nộp lại cho nhóm.
+- **Code snippet:**
+```python
+def chunk(self, text: str) -> list[str]:
+    sections: list[tuple[str, str]] = []
+    current_heading, current_body_lines = "", []
+    for line in text.split("\n"):
+        if re.match(r'^#{1,4}\s+', line):
+            if current_body_lines or current_heading:
+                body = "\n".join(current_body_lines).strip()
+                if body or current_heading:
+                    sections.append((current_heading, body))
+            current_heading, current_body_lines = line.strip(), []
+        else:
+            current_body_lines.append(line)
+    # section body dài hơn max_chunk_size -> RecursiveChunker, heading gắn lại vào từng sub-chunk
 ```
 
 ### So Sánh Giữa Các Thành Viên
 
-| Thành viên | Chiến lược | Chunks trên 11 docs | Điểm mạnh | Điểm yếu |
+> ⚠️ Cột điểm dưới đây lấy từ kết quả tự báo cáo của từng người, nhưng **Nam/Phương/Việt Anh chạy trên `data/hoc-bong/` (chủ đề học bổng) với bộ câu hỏi tự soạn riêng**, **Lan chạy trên corpus dịch vụ đại học của riêng cô ấy** (chưa nộp file dữ liệu), còn Quân chạy đúng bộ 5 câu chính thức (`bench.py::QUERIES`) trên `data/scholarship/`. Số liệu vì vậy chỉ so sánh được ở mức **định tính** cho tới khi cả nhóm chạy lại cùng một benchmark (xem khung ở mục 3).
+
+| Thành viên | Chiến lược (Strategy) | Điểm truy xuất tự báo cáo | Điểm mạnh | Điểm yếu |
 |-----------|----------|----------------------|-----------|----------|
-| Trần Thị Lan | HeadingChunker (500) | 48 chunks | Giữ section trọn vẹn, heading gắn vào sub-chunks | Với mock embedder, nhiều section cùng doc có score gần nhau → section nào lọt top-3 gần ngẫu nhiên |
+| Đoàn Anh Quân | HeadingChunker (custom) | Doc-level 5/5 top-3, answer-level 2/5 đúng đầy đủ (OpenAIEmbedder, bộ câu hỏi chính thức) | Chunk trùng khớp mục quy định khi tài liệu có nhiều heading; giữ được tiêu đề nguồn cho trích dẫn | Tài liệu chỉ có **1 heading** cho cả trang dài (`huce-study-abroad-scholarships`) khiến mọi nội dung phía sau bị gắn nhầm tiêu đề đầu tiên |
+| Nguyễn Phương Nam | FixedSize/Sentence/Recursive (baseline) | 5/5 chunk liên quan trong top-3 (bộ câu hỏi riêng, `MockEmbedder`-tương-đương) | Cài đặt đúng đặc tả, code gọn, dễ kiểm thử | Không tận dụng heading sẵn có của corpus; ranh giới chunk chỉ dựa vào đoạn văn |
+| Trần Thu Phương | HeadingChunker (custom) | 5/5 câu có gold chunk trong top-3, 3/5 câu gold rơi vào top-2 thay vì top-1 | Giữ tiêu đề section trong từng chunk giúp truy vết nhanh | Hai lượt gom (merge) trong `_split` khiến logic khó theo dõi hơn bản của Quân |
+| Đỗ Lê Việt Anh | Recursive (tinh chỉnh) | 5/5 câu có chunk liên quan trong top-3, điểm cosine thực tế khá cao (0.76–0.89) | Code có chú thích rõ 2 pha đệ quy/gom, dễ bảo trì | Không có phương án heading nên với tài liệu nhiều mục dài vẫn phải cắt cứng ở tầng cuối |
+| Trần Thị Lan | HeadingChunker (custom) | 2/5 chunk liên quan trong top-3 (`MockEmbedder`, câu hỏi + corpus dịch vụ đại học riêng) | Phát hiện đúng rủi ro: với `MockEmbedder`, các section cùng tài liệu có điểm gần bằng nhau nên section lọt top-3 gần như ngẫu nhiên; đã làm rõ hiệu quả của metadata filter bằng so sánh A/B (có/không filter) | Điểm thấp nhất nhóm do dùng `MockEmbedder` cho kết luận retrieval thay vì chỉ dùng nó để minh hoạ hạn chế; corpus/câu hỏi khác biệt hoàn toàn nên chưa so sánh trực tiếp được với 4 người còn lại |
 
 **Chiến lược nào tốt nhất cho chủ đề này? Tại sao?**
-> HeadingChunker phù hợp nhất cho tài liệu quy định đại học vì khai thác cấu trúc do người soạn chia sẵn. Mỗi section (## Mức học phí, ## Thời hạn đóng, ## Miễn giảm) là một đơn vị trả lời câu hỏi hoàn chỉnh. FixedSizeChunker cắt giữa câu (mất ngữ cảnh), SentenceChunker gộp quá nhiều quy định khác nhau vào một chunk (gây nhiễu retrieval). Tuy nhiên, HeadingChunker chỉ phát huy tối đa khi kết hợp với embedder thật — với mock, lợi thế bị triệt tiêu vì cosine score ngẫu nhiên.
+> **HeadingChunker** phù hợp nhất cho corpus học bổng — cả ba bản cài đặt độc lập của Quân, Phương và Lan đều tự chọn cùng một ý tưởng, và hai bản chạy trên `OpenAIEmbedder`/embedder thật (Quân, Phương) đều cho doc-level tốt vì mỗi mục quy định (điều kiện, mức cấp, hồ sơ, giải ngân) khớp đúng một chunk. Điểm yếu chung mà thực nghiệm của Quân và Lan cùng chỉ ra: khi một tài liệu chỉ có **một heading** bao trùm nhiều nội dung không liên quan (vd. `huce-study-abroad-scholarships` gộp học bổng Canada, Nhật, Hàn, Singapore dưới cùng 1 tiêu đề Canada), hoặc khi dùng **MockEmbedder** (kết quả của Lan), `HeadingChunker` không tự cứu được retrieval — nhóm cần làm sạch heading thủ công cho các trang liệt kê nhiều học bổng trong 1 file, và bắt buộc dùng embedder thật (OpenAI/local) khi tính điểm chính thức, trước khi nộp bản cuối.
 
 ---
 
 ## 3. Câu hỏi đánh giá & Chất lượng truy xuất (Retrieval Quality) — Nhóm (10 điểm)
 
-### Câu hỏi đánh giá & Câu trả lời chuẩn
+### Câu hỏi đánh giá & Câu trả lời chuẩn (nhóm thống nhất)
 
-> **Đúng 5 câu hỏi**, đa dạng (tra số liệu, hỏi điều kiện, hỏi quy trình, liệt kê). **Câu 2 cần `metadata_filter={"audience": "student"}`**. Gold answer trích được từ tài liệu, không suy đoán.
+> **Đúng 5 câu hỏi**, đa dạng, có thể kiểm chứng; **ít nhất 1 câu** cần lọc metadata mới trả lời tốt. Bộ câu hỏi chính thức được khai báo trong `bench.py` (hằng `QUERIES`) để mọi thành viên chạy đúng cùng một bộ, trên cùng corpus `data/scholarship/`. Mọi gold answer đều **trích nguyên văn từ tài liệu**, không suy đoán quy định của trường.
 
-| # | Câu hỏi (Query) | Câu trả lời chuẩn (Gold Answer) | Chunk chứa thông tin |
-|---|-------|-------------------------------|-----------------------|
-| 1 | Học bổng Sigma Gold có mức bao nhiêu mỗi tháng? | 15 triệu đồng/tháng. | viasm-sigma-gold-scholarship#3 |
-| 2 | Học bổng CMC Khai Phóng yêu cầu chứng chỉ tiếng Anh IELTS từ bao nhiêu? | IELTS 7.5 trở lên hoặc tương đương. | cmcu-scholarship-policy#2 |
-| 3 | Hồ sơ học bổng Sigma Gold cho sinh viên năm thứ nhất gồm những giấy tờ nào? | Bản sao học bạ lớp 12 và bản sao giấy chứng nhận đạt giải nhất, nhì cấp tỉnh/thành phố... | viasm-sigma-gold-scholarship#5 |
-| 4 | Những đối tượng nào được miễn 100% học phí tại Đại học Công nghiệp Hà Nội? | Sinh viên là người có công hoặc con của người có công; mồ côi cả cha và mẹ... | haui-financial-aid-scholarships#2 |
-| 5 | Học bổng dành cho sinh viên ngành Toán được cấp theo tháng ở mức nào? (filter: student) | Học bổng Sigma Gold dành cho sinh viên đại học chính quy ngành Toán, mức 15 triệu đồng/tháng. | viasm-sigma-gold-scholarship#3 |
+| # | Câu hỏi (Query) | Câu trả lời chuẩn (Gold Answer) | Chunk nào chứa thông tin? |
+|---|-------|-------------------------------|--------------------------|
+| 1 | Học bổng ngắn hạn Chính phủ Canada dành cho sinh viên kéo dài bao lâu và yêu cầu điểm trung bình tối thiểu bao nhiêu? **(cần `metadata_filter={"audience": "student"}`)** | 12 tuần, từ tháng 5 đến tháng 9 hằng năm; đối tượng sinh viên năm thứ 2 đến năm cuối; điểm TB tối thiểu **8/10**, yêu cầu thành thạo tiếng Anh hoặc tiếng Pháp. | `huce-study-abroad-scholarships` → mục "Học bổng ngắn hạn dành cho sinh viên (Chính phủ Canada)" |
+| 2 | Học bổng Jensen Huang năm 2025 có bao nhiêu suất và yêu cầu GPA tối thiểu là bao nhiêu? | **50 suất** cho toàn ĐHQG-HCM (tối đa 20 ứng viên/trường thành viên). GPA tối thiểu **3,5/4 hoặc 8,75/10**, IELTS 6.0/TOEFL iBT 80. | `iuoss-jensen-huang-scholarship` |
+| 3 | Học bổng Vallet 2026 dành cho sinh viên miền Bắc trị giá bao nhiêu và yêu cầu học lực gì? | **34.000.000đ/suất**. Sinh viên từ năm thứ II trở lên, học lực Giỏi trở lên, không môn nào phải thi lại. | `usth-vallet-scholarship-2026` |
+| 4 | Học bổng Sigma Gold của VIASM cấp bao nhiêu tiền mỗi tháng và tối đa bao nhiêu suất? | **15 triệu đồng/tháng**, mỗi học kỳ cấp 5 tháng (10 tháng/năm), tối đa 8 học kỳ; tối đa **10 suất**. | `viasm-sigma-gold-scholarship` |
+| 5 | Học bổng Đinh Thiện Lý năm học 2026-2027 giải ngân mấy lần một năm học và vào tháng nào? | **2 lần/năm học**: Học kỳ I vào tháng 11–12, Học kỳ II vào tháng 4–5 (học kỳ Hè nếu có gộp vào đợt I). | `lstf-dinh-thien-ly-scholarship` |
+
+**Dạng hỏi:** tra số liệu (1, 2) · hỏi điều kiện (3) · hỏi quy trình (4) · liệt kê thời gian (5).
+
+### Vì sao câu 1 bắt buộc phải lọc metadata
+
+Câu 1 **không nêu người hỏi là ai**. Trang nguồn `tuyensinh.huce.edu.vn/hoc-bong-du-hoc` được tách thành nhiều tài liệu theo `audience`, cùng cụm từ "học bổng ngắn hạn Chính phủ Canada" nhưng khác đối tượng và **khác đáp án**:
+
+| Tài liệu | `audience` | Thời lượng học bổng |
+|---|---|---|
+| `huce-study-abroad-scholarships` | `student` | **12 tuần**, điểm TB tối thiểu 8/10 |
+| `huce-canada-shortterm-faculty` | `faculty` | **24 tuần**, dành cho giảng viên |
+
+Chạy thực tế `bench.py --strategy heading --no-filter` (Quân): top-1 đổi thành `huce-canada-shortterm-faculty` (+0.7462, đúng vector nhưng sai đối tượng), đẩy tài liệu đúng xuống top-2. Không lọc thì retrieval lẫn hai tài liệu và agent trả lời sai đối tượng — đúng kịch bản mà `K4_VARIANT.md` yêu cầu chứng minh.
 
 ### Tổng hợp chất lượng truy xuất của nhóm
 
-> Scoring: top-3 có chunk liên quan + agent đúng = 2đ, có liên quan nhưng thiếu = 1đ, vắng = 0đ.
-> Chấm **hai mức**: kiểm doc_id (level 1) VÀ kiểm gold_marker trong nội dung (level 2). Level 1 thổi phồng kết quả vì đúng doc nhưng sai section vẫn không trả lời được câu hỏi.
+> Cách chấm (theo `docs/SCORING.md`): **2 điểm/câu** — top-3 chứa chunk liên quan + agent trả lời đúng (2), có liên quan nhưng thiếu/không ở top-1 (1), không có trong top-3 (0).
 
-| # | Câu hỏi | Chiến lược: HeadingChunker | doc_id ở top-3? | marker ở top-3? | Score |
-|---|---------|---------------------------|-----------------|-----------------|-------|
-| 1 | Mức học bổng Sigma Gold? | cmcu#8 (top-1) | ❌ | ❌ | 0 |
-| 2 | IELTS Khai Phóng? | huce#1 (top-1) | ❌ | ❌ | 0 |
-| 3 | Hồ sơ Sigma Gold? | viasm#6 (top-3) | ✓ (đúng doc) | ❌ (sai section) | 1 |
-| 4 | Miễn 100% học phí HaUI? | haui#2 (top-3) | ✓ (đúng doc) | ✓ (đúng marker) | 2 |
-| 5 | Ngành Toán mức nào? (filter: student) | huce#0 | ❌ | ❌ | 0 |
-| | | | | **Tổng** | | **3/10** |
+| # | Câu hỏi | Chiến lược tốt nhất cho câu này | Có chunk liên quan trong top-3? | Ghi chú |
+|---|---------|-------------------------------|-------------------------------|---------|
+| 1 | Học bổng Canada (student) | HeadingChunker + filter `audience=student` | ✓ (Quân, `HeadingChunker`, OpenAIEmbedder) | Agent vẫn **trả lời sai** — chunk bị dính heading sai khiến agent trích nhầm số liệu của học bổng Gamuda Land nằm chung "section" Canada (xem phân tích lỗi ở mục 2) |
+| 2 | Jensen Huang | HeadingChunker | ✓ | Agent trả lời đúng, có trích dẫn `[1]` |
+| 3 | Vallet 2026 | HeadingChunker | ✓ (đúng tài liệu) nhưng chunk chứa "yêu cầu học lực" không lọt top-3 | Agent trả lời đúng phần trị giá, báo "không tìm thấy" phần học lực |
+| 4 | Sigma Gold | HeadingChunker | ✓ | Agent trả lời đúng, có trích dẫn `[1]` |
+| 5 | Đinh Thiện Lý | HeadingChunker | ✓ (đúng tài liệu) nhưng chunk chứa mốc giải ngân không lọt top-3 | Agent từ chối an toàn ("không tìm thấy") thay vì bịa — đúng hành vi mong muốn khi ngữ cảnh thiếu |
+| — | *(Nam/Phương/Việt Anh/Lan)* | — | *cần chạy lại* | Chưa chạy đúng 5 câu hỏi chính thức này trên `data/scholarship/`; số liệu hiện có trong `REPORT_CANHAN.md` của từng người dùng corpus/câu hỏi khác (Nam/Phương/Việt Anh: `data/hoc-bong/`; Lan: corpus dịch vụ đại học tự thu thập, dùng `MockEmbedder`) nên không đưa vào bảng tổng hợp chính thức của nhóm |
 
-> **Chênh lệch hai cách chấm**: Nếu chỉ chấm level 1 (doc_id): 3/5 câu "đúng" → 6/10. Chấm level 2 (marker): chỉ 0/5 có marker → 0/10. Thực tế: 2/10 (đúng doc nhưng sai section = 1đ). **Đây chính là phát hiện đáng giá: HeadingChunker lấy đúng tài liệu nhưng mock embedder không chọn đúng section.**
+**Doc-level (đúng tài liệu trong top-3):** 5/5 (Quân, `HeadingChunker` + `OpenAIEmbedder`).
+**Answer-level (agent trả lời đúng & có căn cứ đầy đủ):** 2/5 — cho thấy **top-3 đúng tài liệu không đồng nghĩa với câu trả lời đúng** khi chunk bị dính heading sai hoặc câu hỏi có 2 vế mà chunk chứa cả hai vế không lọt top-3.
 
 **Lọc bằng metadata có giúp ích không? Ở câu hỏi nào?**
-> **Có, rõ rệt ở Q5**: Không filter → top-3 toàn `dormitory` (audience=student). Có filter `audience=faculty` → chuyển sang đúng `admissions` (audience=faculty) — **metadata filter là quyết định**. Q2 filter `audience=student` loại được docs (audience=faculty) khỏi top-3, nhưng mock embedder vẫn không match đúng nội dung nên chưa đủ.
+> Có, và bắt buộc ở câu 1: nếu không lọc `audience=student`, top-1 đổi hẳn sang tài liệu dành cho giảng viên (`huce-canada-shortterm-faculty`), dẫn tới agent trả lời sai đối tượng dù về mặt embedding tài liệu đó thậm chí có điểm cao hơn tài liệu đúng.
 
-### Phân tích lỗi (Failure Analysis)
-
-**Failure case 1 — Q3: Top-3 đúng tài liệu nhưng sai section**
-- Câu hỏi: "Hồ sơ học bổng Sigma Gold cho sinh viên năm thứ nhất..."
-- Top-3 trả về `viasm-sigma-gold-scholarship#6` (Thông tin liên hệ) thay vì `#5` (Hồ sơ yêu cầu)
-- Nguyên nhân: Mock embedder hash-based → các section trong cùng doc có score gần ngẫu nhiên.
-- Đề xuất: Dùng embedder thật (sentence-transformers multilingual).
-
-**Failure case 2 — Q2: Retrieval sai hoàn toàn dù section rất chi tiết**
-- Câu hỏi: "Học bổng CMC Khai Phóng yêu cầu chứng chỉ tiếng Anh IELTS từ bao nhiêu?"
-- Hệ thống trả về `huce` hoặc CMC `Kiến Tạo` thay vì CMC `Khai Phóng`.
-- Nguyên nhân: Cosine trên mock hash đo "giống chuỗi ký tự" không phân biệt được ý nghĩa của "Khai Phóng" và "Kiến Tạo" (hai section gần nhau trong doc).
-- Đề xuất: Embedder thật sẽ hiểu ngữ nghĩa cụ thể của từng cấp học bổng.
+> **Cần hoàn thiện trước khi nộp:** Nam, Phương, Việt Anh, Lan chạy lại `python bench.py --strategy <chiến lược của mình> --answers` (cần `OPENAI_API_KEY` trong `.env`, hoặc dùng `EMBEDDING_PROVIDER=local`) trên corpus `data/scholarship/` với đúng 5 câu hỏi ở trên, rồi điền kết quả thật vào hai bảng phía trên trước khi nộp bản chính thức. Riêng Lan cần thêm: gửi lại các file dữ liệu dịch vụ đại học (`tuition-fees`, `course-registration-full`, `library-services-full`, `grade-review`, `faculty-teaching-guidelines`, `dormitory`) cho nhóm lưu trữ, vì hiện các file này chỉ tồn tại cục bộ trên máy của Lan.
 
 ---
 
 ## 4. Thuyết trình (Demo) & Bài học nhóm — Nhóm (5 điểm)
 
-**Những phân tích (insights) hay nhất:**
-> 1. **Chênh lệch hai cách chấm**: doc_id-level vs marker-level cho kết quả rất khác — cần chấm ở mức nội dung, không chỉ mức tài liệu
-> 2. **Metadata filter là vũ khí bí mật** khi embedder yếu — Q5 filter `audience=faculty` chuyển top-3 từ toàn docs sinh viên sang đúng docs giảng viên
-> 3. **HeadingChunker giữ section nhưng mock phá hỏng thứ tự** — cùng doc mà section nào lọt top-k gần ngẫu nhiên
+**Những phân tích (insights) hay nhất nhóm sẽ trình bày:**
+1. Ba bạn (Quân, Phương, Lan) cài `HeadingChunker` **độc lập với nhau**, trên hai chủ đề khác nhau (học bổng vs. dịch vụ đại học), và đều đi đến cùng kết luận: chunking theo heading thắng rõ trên văn bản quy định có mục lục sẵn, nhưng thất bại có hệ thống khi một file gộp nhiều nội dung dưới cùng một heading.
+2. **Doc-level top-3 đúng không đảm bảo answer-level đúng**: với bộ câu hỏi chính thức, top-3 đúng tài liệu đạt 5/5 nhưng agent chỉ trả lời đúng đầy đủ 2/5 — nguyên nhân nằm ở chất lượng heading của dữ liệu nguồn và câu hỏi 2 vế, không phải ở embedding hay chiến lược chunking.
+3. Việc tách một trang nguồn thành nhiều tài liệu theo `audience` (HUCE) là minh hoạ tốt cho lý do metadata filter bắt buộc: hai tài liệu cùng chủ đề, cùng từ vựng vẫn cho đáp án khác nhau, và không lọc thì retrieval chọn nhầm gần một nửa số lần thử. Thí nghiệm A/B filter riêng của Lan (trên corpus dịch vụ đại học) cho kết luận tương tự: bỏ filter đổi hẳn top-1 sang tài liệu sai đối tượng.
+4. Kết quả của Lan là bằng chứng phản diện hữu ích: `HeadingChunker` không tự cứu được retrieval nếu chạy trên `MockEmbedder` — chunk đúng vẫn không lọt top-3 vì các section trong cùng tài liệu có điểm gần bằng nhau (nhiễu ngẫu nhiên), củng cố lại bài học ở mục Dự đoán độ tương tự của các báo cáo cá nhân.
 
-**Bài học rút ra khi so sánh:**
-> Chất lượng embedding quyết định ~80% kết quả retrieval, chunking chỉ chiếm ~20%. HeadingChunker tạo chunk mạch lạc (mỗi section là một đơn vị trọn vẹn) nhưng lợi thế này bị triệt tiêu khi dùng mock. Metadata filtering thì không phụ thuộc embedding — nó hoạt động đúng cả với mock, nên là chiến lược phòng thủ tốt.
+**Bài học rút ra khi so sánh trong nhóm:**
+> Cùng ý tưởng (heading-based chunking) nhưng ba bạn cài đặt độc lập (Quân, Phương, Lan) cho ra chi tiết khác nhau (số lượt gom/merge, cách giữ tiêu đề, ngưỡng heading `#{1,4}` so với `#{1,6}`) — chứng tỏ đặc tả bài lab đủ rõ để nhiều người tự đến cùng một giải pháp tối ưu, nhưng chi tiết cài đặt và chất lượng embedder vẫn quyết định việc chunk có "dính" tiêu đề sai hay có lọt top-3 hay không.
 
-**Nếu làm lại, nhóm sẽ thay đổi gì?**
-> 1. Cài embedder thật (sentence-transformers multilingual hoặc Gemini free tier) từ đầu buổi để tải nền trong lúc code
-> 2. Tách trang thư viện thành 2 file (student-library-services + faculty-library-services) theo audience thay vì gộp — filter mới có số liệu A/B thật
-> 3. Thêm cache embedding theo hash nội dung để chạy lại benchmark nhanh hơn
+**Nếu làm lại, nhóm sẽ thay đổi gì trong chiến lược dữ liệu (data strategy)?**
+> Thống nhất corpus và bộ 5 câu hỏi **ngay từ đầu** (nhóm hiện đang có 3 corpus khác nhau — `data/hoc-bong/`, `data/scholarship/`, và corpus dịch vụ đại học của Lan — cùng nhiều bộ câu hỏi riêng, phải hợp nhất lại khi tổng hợp báo cáo) — sẽ tiết kiệm thời gian so sánh. Đồng thời, làm sạch/thêm heading thủ công cho các trang liệt kê nhiều nội dung trong 1 file (`huce-study-abroad-scholarships`) thay vì để `HeadingChunker` tự gánh, và thống nhất dùng embedder thật (không phải `MockEmbedder`) khi tính điểm retrieval chính thức của nhóm.
 
 ---
 
@@ -167,8 +231,10 @@ class HeadingChunker:
 
 | Tiêu chí | Điểm tự đánh giá |
 |----------|-------------------|
-| Lựa chọn tài liệu (Document Set Quality) | 9 / 10 |
-| Thiết kế chiến lược (Strategy Design) | 13 / 15 |
-| Chất lượng truy xuất (Retrieval Quality) | 5 / 10 |
-| Thuyết trình (Demo) | 4 / 5 |
-| **Tổng phần nhóm** | **31 / 40** |
+| Lựa chọn tài liệu (Document Set Quality) | / 10 |
+| Thiết kế chiến lược (Strategy Design) | / 15 |
+| Chất lượng truy xuất (Retrieval Quality) | / 10 |
+| Thuyết trình (Demo) | / 5 |
+| **Tổng phần nhóm** | **/ 40** |
+
+> *Điểm tự đánh giá để trống — nhóm cần họp thống nhất sau khi cả 4 thành viên (Nam, Phương, Việt Anh, Lan) chạy lại benchmark chính thức trên `data/scholarship/` và Lan gửi lại file dữ liệu dịch vụ đại học cho nhóm.*
